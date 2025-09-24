@@ -52,9 +52,7 @@ Now, via the chat interface, you can ask questions about this curling data and t
 
 > [!IMPORTANT]
 > I'm using a model that isn't the most reliable.
-> ```ts
-> const model = workersai("@cf/meta/llama-3.1-8b-instruct");
-> ```
+> https://github.com/xuchef/cf_ai_curling/blob/935538ad57c8bc220e19315184fc98ec34c6e9d3/src/server.ts#L19
 
 ## Running the project
 
