@@ -50,7 +50,7 @@ Now, via the chat interface, you can ask questions about this curling data and t
 
 ...if it wants to.
 
-> [!IMPORTANT]
+> [!WARNING]
 > I'm using a model that isn't the most reliable.
 > https://github.com/xuchef/cf_ai_curling/blob/935538ad57c8bc220e19315184fc98ec34c6e9d3/src/server.ts#L19
 
