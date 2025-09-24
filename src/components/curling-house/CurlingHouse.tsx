@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import {
   ArrowClockwiseIcon,
   ArrowCounterClockwiseIcon,
@@ -13,7 +13,18 @@ interface Stone {
 
 interface CurlingHouseProps {
   stones?: Stone[];
-  shotInfo?: any;
+  shotInfo?: {
+    shot_id?: number;
+    shot_number?: number;
+    shot_color?: string;
+    shot_team?: string;
+    player_name?: string;
+    shot_type?: string;
+    turn?: string;
+    percent_score?: number;
+    end_number?: number;
+    color_hammer?: string;
+  };
   onShotQuery?: (shotId: number) => void;
 }
 
@@ -22,7 +33,7 @@ const ftToPx = (ft: number) => ft * 20;
 export const CurlingHouse: React.FC<CurlingHouseProps> = ({
   stones = [],
   shotInfo,
-  onShotQuery
+  onShotQuery: _onShotQuery
 }) => {
   // Curling ice: 27ft x 15ft
   1380 / 764;
@@ -85,7 +96,9 @@ export const CurlingHouse: React.FC<CurlingHouseProps> = ({
         width={svgWidth}
         height={svgHeight}
         className="outline outline-[#00000080] bg-white"
+        aria-label="Curling house with stone positions"
       >
+        <title>Curling house with stone positions</title>
         {/* Ice surface background */}
         <rect width={svgWidth} height={svgHeight} fill="#f0f8ff" />
 
@@ -150,13 +163,13 @@ export const CurlingHouse: React.FC<CurlingHouseProps> = ({
         />
 
         {/* Stones */}
-        {stones.map((stone, index) => {
+        {stones.map((stone) => {
           const coords = convertCoords(stone.x, stone.y);
           const stoneRadius = ftToPx(11 / 12 / 2);
 
           return (
             <circle
-              key={index}
+              key={`${stone.color}-${stone.x}-${stone.y}`}
               cx={coords.x}
               cy={coords.y}
               r={stoneRadius}

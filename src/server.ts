@@ -128,7 +128,7 @@ export default {
     // Direct database query endpoint for shot details
     if (url.pathname === "/api/shot" && request.method === "GET") {
       const shotId = url.searchParams.get("id");
-      if (!shotId || isNaN(Number(shotId))) {
+      if (!shotId || Number.isNaN(Number(shotId))) {
         return Response.json(
           { success: false, error: "Valid shot ID required" },
           { status: 400 }

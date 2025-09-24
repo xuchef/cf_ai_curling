@@ -6,6 +6,37 @@ import { useAgentChat } from "agents/ai-react";
 import type { UIMessage } from "@ai-sdk/react";
 import type { tools } from "./tools";
 
+// Type definitions
+interface ShotData {
+  success: boolean;
+  shot?: {
+    shot_id: number;
+    shot_number: number;
+    shot_color: string;
+    shot_team: string;
+    player_name: string;
+    shot_type: string;
+    turn: string;
+    percent_score: number;
+    end_number: number;
+    color_hammer: string;
+    event_name: string;
+  };
+  stones?: Array<{ color: "red" | "yellow"; x: number; y: number }>;
+  error?: string;
+}
+
+interface CurrentShot {
+  stones?: Array<{ color: "red" | "yellow"; x: number; y: number }>;
+  shot?: ShotData["shot"];
+  shotInfo?: {
+    player: string;
+    team: string;
+    type: string;
+    shotId: number;
+  };
+}
+
 // Component imports
 import { Button } from "@/components/button/Button";
 import { Card } from "@/components/card/Card";
@@ -26,10 +57,10 @@ const toolsRequiringConfirmation: (keyof typeof tools)[] = [
 ];
 
 export default function Chat() {
-  const [theme] = useState<"dark" | "light">("light");
+  const [_theme] = useState<"dark" | "light">("light");
   const [showDebug, setShowDebug] = useState(false);
   const [textareaHeight, setTextareaHeight] = useState("auto");
-  const [currentShot, setCurrentShot] = useState<any>(null);
+  const [currentShot, setCurrentShot] = useState<CurrentShot | null>(null);
   const [shotId, setShotId] = useState(42);
   const [processedToolCalls, setProcessedToolCalls] = useState<Set<string>>(
     new Set()
@@ -100,12 +131,7 @@ export default function Chat() {
       try {
         // Make direct API call to query the shot
         const response = await fetch(`/api/shot?id=${shotId}`);
-        const data = (await response.json()) as {
-          success: boolean;
-          shot?: any;
-          stones?: Array<{ color: string; x: number; y: number }>;
-          error?: string;
-        };
+        const data = (await response.json()) as ShotData;
 
         if (data.success && data.shot && data.stones) {
           // Update the curling house visualization directly
@@ -184,7 +210,7 @@ export default function Chat() {
               return;
             }
 
-            const result = part.output as any;
+            const result = part.output as Record<string, unknown>;
 
             // Debug logging
             console.log("Tool result detected:", part.type, result);
@@ -195,7 +221,17 @@ export default function Chat() {
               result?.success &&
               result?.visualization
             ) {
-              const viz = result.visualization;
+              const viz = result.visualization as {
+                stones: Array<{
+                  color: "red" | "yellow";
+                  x: number;
+                  y: number;
+                }>;
+                player: string;
+                team: string;
+                shotType: string;
+                shotId: number;
+              };
               console.log("Setting current shot from visualization:", viz);
               setCurrentShot({
                 stones: viz.stones,
@@ -216,7 +252,7 @@ export default function Chat() {
               result?.success &&
               result?.updateShotId
             ) {
-              const newShotId = result.shotId;
+              const newShotId = result.shotId as number;
               console.log("Setting shot ID from tool:", newShotId);
               setShotId(newShotId);
               // Automatically load the shot data
@@ -251,7 +287,13 @@ export default function Chat() {
       <div className="flex gap-4 w-full max-w-6xl">
         <div className="dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 rounded-md flex-shrink-0 p-4">
           <CurlingHouse
-            stones={currentShot?.stones || []}
+            stones={
+              (currentShot?.stones || []) as Array<{
+                color: "red" | "yellow";
+                x: number;
+                y: number;
+              }>
+            }
             shotInfo={currentShot?.shot}
             onShotQuery={handleShotQuery}
           />
@@ -274,16 +316,19 @@ export default function Chat() {
 
             {/* Shot ID Input */}
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">Shot ID:</label>
+              <label htmlFor="shot-id-input" className="text-sm font-medium">
+                Shot ID:
+              </label>
               <input
+                id="shot-id-input"
                 type="number"
                 value={shotId}
                 onChange={(e) => {
                   const value = e.target.value;
-                  setShotId(parseInt(value));
+                  setShotId(parseInt(value, 10));
 
-                  const id = parseInt(value);
-                  if (!isNaN(id)) {
+                  const id = parseInt(value, 10);
+                  if (!Number.isNaN(id)) {
                     handleShotQuery(id);
                   }
                 }}
