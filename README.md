@@ -1,5 +1,7 @@
 # 🥌 Curling Analytics Agent
 
+https://github.com/user-attachments/assets/f0f60232-e7a5-4163-9d12-f7a8d9c9016e
+
 Live at https://cf-ai-chat.michael-xu1816.workers.dev
 
 ## Background
